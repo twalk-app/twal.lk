@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Twalk</title>
+  <meta name="description" content="Twalk nudges weight-loss actions with friendly, science-backed text messages." />
+
+  <style>
+    :root{
+      /* Apple-ish neutrals */
+      --bg:#ffffff;
+      --surface:#ffffff;
+      --soft:#f5f5f7;
+      --line:#d2d2d7;
+
+      --text:#1d1d1f;
+      --muted:#6e6e73;
+
+      --blue:#0071e3;
+      --green:#34c759;
+
+      --shadow: 0 18px 40px rgba(0,0,0,.08);
+      --shadow2: 0 10px 22px rgba(0,0,0,.06);
+      --radius: 22px;
+      --max: 980px;
+
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    *{ box-sizing:border-box; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background: var(--bg);
+      line-height:1.42;
+      letter-spacing: -0.01em;
+    }
+
+    .wrap{
+      max-width:var(--max);
+      margin:0 auto;
+      padding: 34px 18px 72px;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding: 8px 0 26px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:700;
+    }
+
+    .logo{
+      width:44px;
+      height:44px;
+      border-radius: 14px;
+      background: radial-gradient(110% 110% at 20% 10%, rgba(0,113,227,.25), rgba(0,113,227,.04) 45%, rgba(52,199,89,.06) 100%),
+                  linear-gradient(135deg, rgba(0,113,227,.95), rgba(52,199,89,.88));
+      box-shadow: 0 14px 28px rgba(0,113,227,.18);
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+    }
+
+    .logo svg{ width:22px; height:22px; fill:#fff; }
+
+    .brandname{
+      font-size: 18px;
+      letter-spacing:-0.02em;
+    }
+
+    .domain{
+      font-family:var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .tag{
+      font-size: 12px;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      background: rgba(245,245,247,.75);
+      padding: 8px 12px;
+      border-radius: 999px;
+      backdrop-filter: blur(10px);
+      white-space:nowrap;
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns: 1.08fr .92fr;
+      gap: 22px;
+      align-items:stretch;
+    }
+    @media (max-width: 920px){
+      .hero{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      border: 1px solid rgba(210,210,215,.9);
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .left{
+      padding: 34px 30px;
+      background:
+        radial-gradient(120% 120% at 10% 0%, rgba(0,113,227,.10), rgba(0,113,227,0) 52%),
+        radial-gradient(120% 120% at 100% 20%, rgba(52,199,89,.10), rgba(52,199,89,0) 55%),
+        #fff;
+    }
+
+    .kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(245,245,247,.75);
+      color: var(--muted);
+      font-size: 14px;
+      backdrop-filter: blur(10px);
+    }
+    .kicker svg{ width:16px; height:16px; fill: var(--blue); }
+
+    h1{
+      margin: 14px 0 12px;
+      font-size: clamp(40px, 4.6vw, 64px);
+      line-height: 1.02;
+      letter-spacing: -0.045em;
+    }
+
+    .lead{
+      margin:0;
+      font-size: 19px;
+      color: var(--muted);
+      max-width: 62ch;
+    }
+
+    .pillrow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top: 20px;
+    }
+
+    .pill{
+      font-size: 13px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(245,245,247,.9);
+      color: var(--text);
+    }
+    .pill strong{ font-weight: 700; }
+
+    .strip{
+      margin-top: 22px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px 18px;
+      background: linear-gradient(135deg, rgba(0,113,227,.10), rgba(52,199,89,.08));
+    }
+
+    .strip h2{
+      margin:0 0 6px;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .strip p{
+      margin:0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .right{
+      padding: 18px;
+      display:flex;
+      flex-direction:column;
+      gap: 14px;
+      background: linear-gradient(180deg, rgba(245,245,247,.6), #fff);
+      box-shadow: var(--shadow2);
+    }
+
+    .phone{
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 16px 14px;
+      background:#fff;
+      box-shadow: 0 18px 44px rgba(0,0,0,.08);
+      position:relative;
+      min-height: 360px;
+      flex: 1;
+    }
+
+    .phone:before{
+      content:"";
+      position:absolute;
+      left:50%;
+      transform:translateX(-50%);
+      top:10px;
+      width: 128px;
+      height: 18px;
+      background: #000;
+      opacity: .06;
+      border-radius: 0 0 14px 14px;
+    }
+
+    .chat{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top: 22px;
+    }
+
+    .bubble{
+      max-width: 86%;
+      padding: 11px 12px;
+      border-radius: 18px;
+      font-size: 14px;
+      border: 1px solid var(--line);
+      background:#fff;
+    }
+
+    .bubble.me{
+      margin-left:auto;
+      border-color: rgba(0,113,227,.25);
+      background: rgba(0,113,227,.08);
+    }
+
+    .bubble .meta{
+      display:block;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .minirow{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 560px){
+      .minirow{ grid-template-columns: 1fr; }
+    }
+
+    .mini{
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px 14px;
+      background: rgba(245,245,247,.65);
+    }
+
+    .mini h3{
+      margin: 2px 0 6px;
+      font-size: 14px;
+      letter-spacing: -0.01em;
+    }
+
+    .mini p{
+      margin:0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .mini svg{
+      width: 18px;
+      height: 18px;
+      fill: var(--blue);
+      vertical-align:-3px;
+      margin-right: 6px;
+    }
+
+    .section{
+      margin-top: 26px;
+      padding-top: 10px;
+    }
+
+    .sectionhead{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 14px;
+      flex-wrap:wrap;
+    }
+
+    .smallcaps{
+      font-family: var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .grid3{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 14px;
+    }
+    @media (max-width: 900px){
+      .grid3{ grid-template-columns: 1fr; }
+    }
+
+    .feat{
+      padding: 18px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background:#fff;
+      box-shadow: 0 12px 26px rgba(0,0,0,.05);
+    }
+
+    .ico{
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display:grid;
+      place-items:center;
+      background: rgba(0,113,227,.09);
+      border: 1px solid rgba(0,113,227,.18);
+    }
+    .ico svg{ width: 20px; height: 20px; fill: var(--blue); }
+
+    .feat h4{
+      margin: 10px 0 6px;
+      font-size: 16px;
+      letter-spacing: -0.01em;
+    }
+    .feat p{ margin:0; color: var(--muted); font-size: 14px; }
+
+    .science{
+      padding: 20px;
+    }
+    .science h2{
+      margin: 6px 0 10px;
+      letter-spacing: -0.02em;
+      font-size: 22px;
+    }
+    .science p{
+      margin:0;
+      color: var(--muted);
+      max-width: 86ch;
+      font-size: 15px;
+    }
+
+    footer{
+      margin-top: 28px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12.5px;
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .dot{
+      display:inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--blue);
+      opacity: .55;
+      margin: 0 8px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand" aria-label="Twalk">
+        <div class="logo" aria-hidden="true">
+          <!-- footprint icon (inline, no external assets) -->
+          <svg viewBox="0 0 24 24" role="img" aria-label="Footprint">
+            <path d="M9.2 12.8c-1.7 0-3.2 2-3.2 4 0 1.8 1.1 3.2 2.7 3.2 1.9 0 3.5-1.7 3.5-3.8 0-1.8-1.2-3.4-3-3.4zm8.3-1.8c-1.4 0-2.5 1.7-2.5 3.3 0 1.7 1 3.1 2.4 3.1 1.6 0 2.8-1.5 2.8-3.3 0-1.6-1.1-3.1-2.7-3.1zM17.7 4.3c-1 0-1.8 1-1.8 2.2 0 1.1.7 2 1.7 2 1.1 0 2-.9 2-2.1 0-1.1-.9-2.1-1.9-2.1zM13.8 3c-.9 0-1.6.9-1.6 2 0 1 .7 1.9 1.6 1.9 1 0 1.8-.8 1.8-1.9 0-1.1-.8-2-1.8-2zM10.6 3.9c-.8 0-1.4.8-1.4 1.8 0 .9.6 1.7 1.3 1.7.9 0 1.6-.8 1.6-1.8 0-.9-.7-1.7-1.5-1.7zM7.9 5.6c-.7 0-1.2.7-1.2 1.6 0 .8.5 1.5 1.1 1.5.8 0 1.4-.7 1.4-1.6 0-.8-.6-1.5-1.3-1.5z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brandname">Twalk</div>
+          <div class="domain">twa.lk</div>
+        </div>
+      </div>
+      <div class="tag">Friendly nudges by text</div>
+    </header>
+
+    <main class="hero">
+      <section class="card left">
+        <div class="kicker">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l1.7 6.1L20 10l-6.3 1.9L12 18l-1.7-6.1L4 10l6.3-1.9L12 2z"/></svg>
+          Behavioral science for the starting line
+        </div>
+
+        <h1>Weight loss starts with starting.</h1>
+
+        <p class="lead">
+          Twalk is a text-message service that nudges the tiny actions that make weight loss happen:
+          planning, choosing, walking, logging, and resetting after a slip.
+        </p>
+
+        <div class="pillrow" aria-label="Key points">
+          <div class="pill"><strong>Right moment</strong> nudges</div>
+          <div class="pill"><strong>Fresh</strong> message each time</div>
+          <div class="pill"><strong>Gentle</strong> accountability</div>
+          <div class="pill"><strong>Private</strong> by default</div>
+        </div>
+
+        <div class="strip" role="note" aria-label="Positioning statement">
+          <h2>Less motivation. More momentum.</h2>
+          <p>Twalk turns “later” into “done” with small prompts that respect your day.</p>
+        </div>
+      </section>
+
+      <aside class="card right" aria-label="Example messages">
+        <div class="phone" aria-label="Text message preview">
+          <div class="chat">
+            <div class="bubble">
+              Tiny start: put on your shoes. That’s the whole task for now. 👟
+              <span class="meta">Twalk • 08:12</span>
+            </div>
+
+            <div class="bubble me">
+              Done
+              <span class="meta">You • 08:13</span>
+            </div>
+
+            <div class="bubble">
+              Nice. Want the next 3‑minute step? A short walk to the corner and back. 🚶
+              <span class="meta">Twalk • 08:14</span>
+            </div>
+
+            <div class="bubble">
+              If you’re already in the kitchen: drink water, then decide breakfast. 💧
+              <span class="meta">Twalk • 09:02</span>
+            </div>
+
+            <div class="bubble">
+              Reset beats perfect. One good choice now is a full restart. 🌿
+              <span class="meta">Twalk • 19:41</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="minirow">
+          <div class="mini">
+            <h3>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 00-7 7c0 2.2 1 4.2 2.7 5.5V20a2 2 0 002 2h4.6a2 2 0 002-2v-5.5A7 7 0 0019 9a7 7 0 00-7-7zm2.3 18H9.7v-3h4.6v3zm0-5H9.7v-1.1c0-.4-.2-.8-.5-1A4.9 4.9 0 017 9a5 5 0 0110 0c0 1.6-.8 3.1-2.2 3.9-.3.2-.5.6-.5 1V15z"/></svg>
+              Science-backed
+            </h3>
+            <p>Designed around proven behavior-change principles, written for real humans.</p>
+          </div>
+
+          <div class="mini">
+            <h3>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C7.6 2 4 5.6 4 10c0 5.2 6.7 11.2 7 11.4.6.5 1.4.5 2 0 .3-.2 7-6.2 7-11.4 0-4.4-3.6-8-8-8zm0 10.8A2.8 2.8 0 1112 7a2.8 2.8 0 010 5.8z"/></svg>
+              Right-time nudges
+            </h3>
+            <p>Prompts arrive when action is likely, not when your phone is face down.</p>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="section" aria-label="How it works">
+      <div class="sectionhead">
+        <div>
+          <div class="smallcaps">How Twalk works</div>
+          <h2 style="margin:6px 0 0; letter-spacing:-.02em; font-size:22px;">A gentle nudge engine for weight-loss actions</h2>
+        </div>
+        <div class="tag">US &amp; Europe</div>
+      </div>
+
+      <div class="grid3">
+        <div class="feat">
+          <div class="ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M7 2h10a2 2 0 012 2v16a2 2 0 01-2 2H7a2 2 0 01-2-2V4a2 2 0 012-2zm5 18a1.2 1.2 0 100-2.4 1.2 1.2 0 000 2.4zM7 5h10V4H7v1z"/></svg>
+          </div>
+          <h4>Text messages, not another app</h4>
+          <p>Weight loss happens in the middle of real life. Twalk meets you where you already are.</p>
+        </div>
+
+        <div class="feat">
+          <div class="ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 3l2.2 6.6H21l-5.4 3.9 2.1 6.5L12 16.1 6.3 20l2.1-6.5L3 9.6h6.8L12 3z"/></svg>
+          </div>
+          <h4>Micro-steps that bypass negotiation</h4>
+          <p>Instead of “work out,” you get “shoes on.” Instead of “eat clean,” you get “choose breakfast.”</p>
+        </div>
+
+        <div class="feat">
+          <div class="ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 22C6.5 22 2 17.5 2 12S6.5 2 12 2s10 4.5 10 10-4.5 10-10 10zm-1-6l7-7-1.4-1.4L11 13.2 7.4 9.6 6 11l5 5z"/></svg>
+          </div>
+          <h4>Completion closes the loop</h4>
+          <p>A quick “done” reinforces momentum, even when progress is small.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-label="The science in plain language">
+      <div class="card science">
+        <div class="smallcaps">Why it works</div>
+        <h2>Your brain discounts tomorrow. Twalk lives in today.</h2>
+        <p>
+          Weight loss intentions fail for predictable reasons: delayed rewards, immediate friction, and unclear first steps.
+          Twalk uses timed prompts, implementation cues, and supportive accountability to reduce friction and spark action.
+        </p>
+        <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+          <span class="pill">⏳ Present bias</span>
+          <span class="pill">🧠 Implementation cues</span>
+          <span class="pill">🔁 Habit loops</span>
+          <span class="pill">🧩 Reduce ambiguity</span>
+          <span class="pill">🌿 Reset fast</span>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>
+        <span class="smallcaps">Twalk</span>
+        <span class="dot" aria-hidden="true"></span>
+        <span style="font-family:var(--mono);">twa.lk</span>
+      </div>
+      <div>© 2026 Twalk. Privacy-first prompts. Not medical advice.</div>
+    </footer>
+  </div>
+</body>
+</html>
